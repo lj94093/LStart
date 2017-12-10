@@ -4,6 +4,7 @@
 将LStart/bin/Debug下的LStart.exe下载下来即可使用
 # 功能介绍
 主界面如下所示：
+
 ![](pic/主界面.png)
 
 批量导入功能及搜索功能
