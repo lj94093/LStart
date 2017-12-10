@@ -1,0 +1,146 @@
+﻿<ListBox x:Class="LStart.Controls.LeftList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LStart.Controls"
+             xmlns:lStart="clr-namespace:LStart"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" FontSize="12">
+    <ListBox.Resources>
+<!--        scrollView滚动条-->
+        <Style TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Rectangle Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="ScrollBar.Static.Thumb" Color="#60aaaaaa"/>
+        <Style x:Key="ScrollBarThumbVertical" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Rectangle x:Name="rectangle" Fill="{StaticResource ScrollBar.Static.Thumb}" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
+            <Setter Property="Background" Value="{StaticResource Background}"/>
+            <Setter Property="Foreground" Value="{StaticResource Background}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="7"/>
+            <Setter Property="MinWidth" Value="7"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsMouseOver}">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollBarThumbVertical}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                            <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+<!--        item右键菜单-->
+        <ContextMenu x:Key="ContextMenu">
+            <MenuItem Header="重命名" Click="RenameItem_OnClick"></MenuItem>
+            <MenuItem Header="删除" Click="DeleteMenuItem_OnClick"></MenuItem>
+        </ContextMenu>
+        <!--        items源提供器-->
+        <ObjectDataProvider x:Key="LoadGroup" ObjectType="{x:Type lStart:UserConfig}" MethodName="get_userGroups" />
+        <!--        listboxitem模板-->
+        <ControlTemplate x:Key="LeftListItemTemplate" TargetType="ListBoxItem">
+
+            <Border Background="{TemplateBinding Background}" MouseLeftButtonDown="Drag_OnMouseDown"  AllowDrop="True">
+                <ContentPresenter>
+                    <ContentPresenter.ContentTemplate>
+                        <DataTemplate DataType="lStart:UserGroup">
+                            <TextBox BorderThickness="0" Text="{Binding Path=name,Mode=TwoWay}" Focusable="False" Cursor="Arrow" 
+                                     Background="{x:Null}"
+                                     ContextMenu="{StaticResource ContextMenu}"
+                                     LostKeyboardFocus="TextBox_OnLostKeyboardFocus"
+                                     LostFocus="TextBox_OnLostFocus"
+                                     Foreground="White" 
+                                     FocusVisualStyle="{x:Null}"
+                                     PreviewKeyDown="TextBox_OnKeyDown" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                     PreviewDrop="Item_OnDrop" PreviewDragOver="Item_OnPreviewDragOver">
+                            </TextBox>
+                            <!--                                     Background="{Binding RelativeSource={x:Static RelativeSource.Self},-->
+                            <!--                       Path=(Validation.Errors)[0].ErrorContent}">-->
+                        </DataTemplate>
+
+                    </ContentPresenter.ContentTemplate>
+                </ContentPresenter>
+            </Border>
+        </ControlTemplate>
+        <!--        ListBoxItem样式-->
+        <Style x:Key="LeftListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="AllowDrop" Value="True"></Setter>
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <!--                        <Setter Property="ContextMenu" Value="{StaticResource ContextMenu}"/>-->
+            <Setter Property="Template" Value="{StaticResource LeftListItemTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="true">
+                    <Setter Property="Background" Value="#FF2160A0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </ListBox.Resources>
+    <ListBox.Style>
+        <Style TargetType="ListBox">
+            <Setter Property="ItemsSource" Value="{Binding Source={StaticResource LoadGroup}}"></Setter>
+            <Setter Property="BorderBrush" Value="{StaticResource Background}"></Setter>
+            <Setter Property="Background" Value="{StaticResource Background}"></Setter>
+            <Setter Property="AllowDrop" Value="True"></Setter>
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <!--            <Setter Property="FontSize" Value="12"></Setter>-->
+            <Setter Property="ItemContainerStyle" Value="{StaticResource LeftListItemStyle}"></Setter>
+        </Style>
+    </ListBox.Style>
+</ListBox>
